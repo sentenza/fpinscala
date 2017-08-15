@@ -1,5 +1,7 @@
 package fpinscala.gettingstarted
 
+import java.util.Locale
+
 // A comment!
 /* Another comment */
 /** A documentation comment */
@@ -12,9 +14,20 @@ object MyModule {
     val msg = "The absolute value of %d is %d"
     msg.format(x, abs(x))
   }
+  
+  private def formatFibonacci(n: Int) = {
+    val msg = "The %dth Fibonacci number is %,.2f"
+    msg.format(n, fib(n))
+  }
 
-  def main(args: Array[String]): Unit =
+  def main(args: Array[String]): Unit = {
     println(formatAbs(-42))
+    println(formatFibonacci(8))
+    println(formatFibonacci(13))
+    println(formatFibonacci(21))
+    println(formatFibonacci(34))
+    println(formatFibonacci(556))
+  }
 
   // A definition of factorial, using a local, tail recursive function
   def factorial(n: Int): Int = {
@@ -36,7 +49,20 @@ object MyModule {
 
   // Exercise 1: Write a function to compute the nth fibonacci number
 
-  def fib(n: Int): Int = ???
+  def fib(n: Int): Double = {
+    @annotation.tailrec
+    def loop(step: Int, prev: Double, curr: Double): Double = {
+      if (step ==  n) curr
+      else loop(step + 1, curr, curr + prev)
+    }
+    
+    if (n < 0)
+      throw new Exception("Invalid argument. n: " + n)
+    if (n == 0)      0.0
+    else if (n == 1) 1.0
+
+    else loop(1, 0.0, 1.0)
+  }
 
   // This definition and `formatAbs` are very similar..
   private def formatFactorial(n: Int) = {
