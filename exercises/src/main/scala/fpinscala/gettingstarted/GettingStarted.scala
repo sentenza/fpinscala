@@ -14,7 +14,7 @@ object MyModule {
     val msg = "The absolute value of %d is %d"
     msg.format(x, abs(x))
   }
-  
+
   private def formatFibonacci(n: Int) = {
     val msg = "The %dth Fibonacci number is %,.2f"
     msg.format(n, fib(n))
@@ -55,7 +55,7 @@ object MyModule {
       if (step ==  n) curr
       else loop(step + 1, curr, curr + prev)
     }
-    
+
     if (n < 0)
       throw new Exception("Invalid argument. n: " + n)
     if (n == 0)      0.0
@@ -97,7 +97,7 @@ object TestFib {
   // test implementation of `fib`
   def main(args: Array[String]): Unit = {
     println("Expected: 0, 1, 1, 2, 3, 5, 8")
-    println("Actual:   %d, %d, %d, %d, %d, %d, %d".format(fib(0), fib(1), fib(2), fib(3), fib(4), fib(5), fib(6)))
+    println("Actual:   %,.0f, %,.0f, %,.0f, %,.0f, %,.0f, %,.0f, %,.0f".format(fib(0), fib(1), fib(2), fib(3), fib(4), fib(5), fib(6)))
   }
 }
 
@@ -121,11 +121,13 @@ object AnonymousFunctions {
 
 object MonomorphicBinarySearch {
 
-  // First, a binary search implementation, specialized to `Double`,
-  // another primitive type in Scala, representing 64-bit floating
-  // point numbers
-  // Ideally, we could generalize this to work for any `Array` type,
-  // so long as we have some way of comparing elements of the `Array`
+  /**
+   * First, a binary search implementation, specialized to `Double`,
+   * another primitive type in Scala, representing 64-bit floating
+   * point numbers
+   * Ideally, we could generalize this to work for any `Array` type,
+   * so long as we have some way of comparing elements of the `Array`
+   */
   def binarySearch(ds: Array[Double], key: Double): Int = {
     @annotation.tailrec
     def go(low: Int, mid: Int, high: Int): Int = {
@@ -141,11 +143,9 @@ object MonomorphicBinarySearch {
     }
     go(0, 0, ds.length - 1)
   }
-
 }
 
 object PolymorphicFunctions {
-
   // Here's a polymorphic version of `binarySearch`, parameterized on
   // a function for testing whether an `A` is greater than another `A`.
   def binarySearch[A](as: Array[A], key: A, gt: (A,A) => Boolean): Int = {
@@ -166,7 +166,15 @@ object PolymorphicFunctions {
 
   // Exercise 2: Implement a polymorphic function to check whether
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ???
+  def isSorted[A](as: Array[A], gt: (A, A) => Boolean): Boolean = {
+    @annotation.tailrec
+    def loop(index: Int): Boolean = {
+      if (index >= as.length - 1) true
+      else if (gt(as(n), as(n+1))) false
+      else loop(n+1)
+    }
+    loop(0)
+  }
 
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
@@ -178,14 +186,16 @@ object PolymorphicFunctions {
 
   // Note that `=>` associates to the right, so we could
   // write the return type as `A => B => C`
-  def curry[A,B,C](f: (A, B) => C): A => (B => C) =
-    ???
+  def curry[A,B,C](f: (A, B) => C): A => (B => C) = {
+    (a: A) => ((b: B) => f(a, b)) //C
+  }
 
   // NB: The `Function2` trait has a `curried` method already
 
   // Exercise 4: Implement `uncurry`
-  def uncurry[A,B,C](f: A => B => C): (A, B) => C =
-    ???
+  def uncurry[A,B,C](f: A => B => C): (A, B) => C = {
+    (a: A, b: B) => f(a)(b)
+  }
 
   /*
   NB: There is a method on the `Function` object in the standard library,
@@ -200,5 +210,5 @@ object PolymorphicFunctions {
   // Exercise 5: Implement `compose`
 
   def compose[A,B,C](f: B => C, g: A => B): A => C =
-    ???
+    a => f(g(a))
 }
