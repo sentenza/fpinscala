@@ -16,22 +16,40 @@ object Monoid {
     val zero = ""
   }
 
-  def listMonoid[A] = new Monoid[List[A]] {
+  def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
     def op(a1: List[A], a2: List[A]) = a1 ++ a2
     val zero = Nil
   }
 
-  val intAddition: Monoid[Int] = ???
+  val intAddition: Monoid[Int] = new Monoid[Int] {
+    def op(x: Int, y: Int): Int = x + y
+    val zero = 0
+  }
 
-  val intMultiplication: Monoid[Int] = ???
+  val intMultiplication: Monoid[Int] = new Monoid[Int] {
+    def op(x: Int, y: Int): Int = x * y
+    val zero = 1
+  }
 
-  val booleanOr: Monoid[Boolean] = ???
+  val booleanOr: Monoid[Boolean] = new Monoid[Boolean] {
+    def op(a: Boolean, b: Boolean): Boolean = a || b
+    val zero = false
+  }
 
-  val booleanAnd: Monoid[Boolean] = ???
+  val booleanAnd: Monoid[Boolean] = new Monoid[Boolean] {
+    def op(a: Boolean, b: Boolean): Boolean = a && b
+    val zero = true
+  }
 
-  def optionMonoid[A]: Monoid[Option[A]] = ???
+  def optionMonoid[A]: Monoid[Option[A]] = new Monoid[Option[A]] {
+    def op(z: Option[A], t: Option[A]): Option[A] = z orElse  t
+    val zero: Option[A] = None
+  }
 
-  def endoMonoid[A]: Monoid[A => A] = ???
+  def endoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
+    def op(f: A => A, g: A => A): A => A = f.compose(g)
+    val zero: A => A = (t: A) => t // identity
+  }
 
   // TODO: Placeholder for `Prop`. Remove once you have implemented the `Prop`
   // data type from Part 2.
@@ -47,13 +65,19 @@ object Monoid {
   def trimMonoid(s: String): Monoid[String] = ???
 
   def concatenate[A](as: List[A], m: Monoid[A]): A =
-    ???
+    as.foldRight(m.zero)(m.op)
 
+  /**
+    * @tparam A We assume that A hasn't a Monoid
+    * @tparam B B has a Monoid per definition
+    * @return We turn a type A into B, which forms a monoid
+    */
   def foldMap[A, B](as: List[A], m: Monoid[B])(f: A => B): B =
-    ???
+    as.foldLeft(m.zero)((x, y) => m.op(x, f(y)))
 
+  /** Implementing foldRight using foldMap */
   def foldRight[A, B](as: List[A])(z: B)(f: (A, B) => B): B =
-    ???
+    foldMap(as, endoMonoid[B])(f.curried)(z) // pure magic!
 
   def foldLeft[A, B](as: List[A])(z: B)(f: (B, A) => B): B =
     ???

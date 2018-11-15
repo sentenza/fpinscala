@@ -170,8 +170,8 @@ object PolymorphicFunctions {
     @annotation.tailrec
     def loop(index: Int): Boolean = {
       if (index >= as.length - 1) true
-      else if (gt(as(n), as(n+1))) false
-      else loop(n+1)
+      else if (gt(as(index), as(index + 1))) false
+      else loop(index + 1)
     }
     loop(0)
   }
