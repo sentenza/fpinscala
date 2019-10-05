@@ -1,5 +1,5 @@
 val commonSettings = Seq(
-  scalaVersion := "2.12.1"
+  scalaVersion := "2.12.10"
 )
 
 lazy val root = (project in file("."))
@@ -20,3 +20,10 @@ lazy val answers = (project in file("answers"))
   .settings(
     name := "answers"
   )
+
+  // Command Aliases
+addCommandAlias("ll", "projects")
+
+addCommandAlias("cd", "project")
+
+addCommandAlias("exe", "project exercises")
