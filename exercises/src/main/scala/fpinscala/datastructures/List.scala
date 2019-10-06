@@ -1,4 +1,5 @@
 package fpinscala.datastructures
+import scala.annotation.tailrec
 
 sealed trait List[+A] // `List` data type, parameterized on a type, `A`
 case object Nil extends List[Nothing] // A `List` data constructor representing the empty list
@@ -45,6 +46,13 @@ object List { // `List` companion object. Contains functions for creating and wo
       case Cons(x, xs) => f(x, foldRight(xs, z)(f))
     }
 
+  // 3.10
+  @tailrec
+  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Nil                     => z
+    case Cons(headElement, tail) => foldLeft(tail, f(z, headElement))(f)
+  }
+
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x, y) => x + y)
 
@@ -73,14 +81,40 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
     case Cons(h, tail) if f(h) => dropWhile(tail, f)
-    case _ => l
+    case _                     => l
   }
 
   def init[A](l: List[A]): List[A] = ???
 
-  def length[A](l: List[A]): Int = ???
+  def length[A](l: List[A]): Int =
+    foldRight(l, 0)((_, accumulator) => accumulator + 1)
 
-  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  // 3.11
+  def sumLeft(l: List[Int]) = foldLeft(l, 0)(_ + _)
+
+  def productLeft(l: List[Int]) = foldLeft(l, 1)(_ * _)
+
+  def lengthLeft(l: List[Int]) = foldLeft(l, 0)((acc, _) => acc + 1)
+
+  // 3.12 reverse
+  def reverse[T](l: List[T]): List[T] =
+    foldLeft(l, Nil: List[T])( // Note that we need to declare Nil's type List[T] to avoid List[Nothing]
+      (carry, h) => Cons(h, carry) // Reversing the list
+    )
+
+  // 3.13 foldLeft in terms of foldRight (and vice versa) - using reverse and cheating
+  // 3.14 implement append in terms of foldLeft
+  def appendFoldRight[T](firstList: List[T], secondList: List[T]): List[T] =
+    foldRight(firstList, secondList)(Cons(_, _))
+
+  // def appendFoldLeft[T](f: List[T], s: List[T]): List[T] =
+  //   foldLeft(s, f)((xs, ys) => Cons(xs, ys))
 
   def map[A, B](l: List[A])(f: A => B): List[B] = ???
+
+  def lprint[A](l: List[A]): String = l match {
+    case Nil              => "()"
+    case Cons(head, Nil)  => s"${head}"
+    case Cons(head, tail) => s"${head} :: " + lprint(tail)
+  }
 }
